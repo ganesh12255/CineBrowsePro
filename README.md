@@ -23,24 +23,15 @@ Vanilla JavaScript
 CineBrowse/
 │
 ├── index.html
-├── style.css (optional if used)
-├── script.js
 └── README.md
 
 
 🔗 Quick Access Platforms (Legal & Safe)
 
 CineBrowse provides direct access to trusted streaming platforms like:
-Netflix
-Amazon Prime Video
-Disney+ Hotstar
-Sony LIV
-ZEE5
-JioCinema
-YouTube Movies
 📦 Installation
 Clone the repository:
-git clone https://github.com/yourusername/cinebrowse.git
+git clone (https://github.com/ganesh12255/CineBrowsePro)
 Open index.html in your browser.
 No backend or installation required.
 🎯 Purpose
