@@ -130,6 +130,36 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         }
     </style>
 </head>
+    <!-- PWA Manifest -->
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#e50914">
+
+<script>
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker
+        .register("/service-worker.js")
+        .then((registration) => {
+          console.log("✅ Service Worker Registered:", registration.scope);
+
+          // 🔄 Auto Update Check
+          registration.onupdatefound = () => {
+            const newWorker = registration.installing;
+            newWorker.onstatechange = () => {
+              if (newWorker.state === "installed" && navigator.serviceWorker.controller) {
+                console.log("🔄 New update available. Refresh to update.");
+              }
+            };
+          };
+        })
+        .catch((error) => {
+          console.log("❌ Service Worker Registration Failed:", error);
+        });
+    });
+  } else {
+    console.log("⚠️ Service Worker not supported in this browser.");
+  }
+</script>
 <body class="theme-red select-none">
     <!-- Google Tag Manager (noscript) -->
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KW32RNC8"
@@ -875,6 +905,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
         // Initialize App
         const browser = new CineBrowseEngine();
+
+        navigator.serviceWorker.addEventListener("controllerchange", () => {
+  window.location.reload();
+});
     </script>
 </body>
 </html>
