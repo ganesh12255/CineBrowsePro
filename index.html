@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#000000">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="description" content="CineBrowse Pro - Advanced Movie Browser">
+    <title>CineBrowse Pro - Watch movies, Animes and Webseries</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --accent: #e50914; /* Default Red */
+            --bg-dark: #050505;
+            --bg-panel: #121212;
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --safe-top: env(safe-area-inset-top, 0px);
+            --safe-bottom: env(safe-area-inset-bottom, 0px);
+        }
+
+        /* Theme Variables managed by JS */
+        .theme-red { --accent: #e50914; }
+        .theme-blue { --accent: #3b82f6; }
+        .theme-purple { --accent: #8b5cf6; }
+        .theme-green { --accent: #10b981; }
+        .theme-orange { --accent: #f97316; }
+
+        html, body {
+            overscroll-behavior: none;
+            overflow: hidden;
+            height: 100%;
+            height: -webkit-fill-available;
+            background: var(--bg-dark);
+            color: #fff;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+        
+        /* Utilities */
+        .glass {
+            background: rgba(18, 18, 18, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-top: 1px solid var(--glass-border);
+        }
+
+        .glass-panel {
+            background: rgba(20, 20, 20, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* Address Bar Input */
+        .address-input {
+            background: rgba(255, 255, 255, 0.08);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .address-input:focus-within {
+            background: rgba(255, 255, 255, 0.12);
+            box-shadow: 0 0 0 2px var(--accent);
+        }
+
+        /* Animations */
+        @keyframes slideUp { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes pulse-ring { 0% { transform: scale(0.8); opacity: 0.5; } 100% { transform: scale(2); opacity: 0; } }
+        @keyframes progress { 0% { width: 0%; opacity: 1; } 50% { width: 70%; } 100% { width: 100%; opacity: 0; } }
+
+        .animate-slide-up { animation: slideUp 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+        .animate-fade-in { animation: fadeIn 0.2s ease forwards; }
+        .animate-progress { animation: progress 1.5s ease-in-out infinite; }
+        
+        .tab-grid-item {
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .tab-grid-item:active { transform: scale(0.96); }
+
+        /* Media Sniffer Pulse */
+        .sniffer-active::before {
+            content: '';
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 100%; height: 100%;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            border: 2px solid var(--accent);
+            animation: pulse-ring 2s infinite;
+        }
+
+        /* Night Mode Overlay */
+        .night-overlay {
+            pointer-events: none;
+            background: rgba(0, 0, 0, 0.3);
+            mix-blend-mode: multiply;
+            z-index: 30;
+            transition: opacity 0.3s;
+            opacity: 0;
+        }
+        .night-mode-active .night-overlay { opacity: 1; }
+
+        /* Panels */
+        .panel-slide {
+            transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+            will-change: transform;
+        }
+    </style>
+</head>
+<body class="theme-red select-none">
+
+    <!-- App Container -->
+    <div id="app" class="flex flex-col h-full relative">
+        
+        <!-- Top Bar (Address & Controls) -->
+        <header class="bg-[#050505] border-b border-white/10 pt-[var(--safe-top)] shrink-0 z-40 relative">
+            
+            <!-- Progress Bar -->
+            <div class="h-0.5 w-full bg-transparent absolute bottom-0 left-0 overflow-hidden">
+                <div id="progressBar" class="h-full bg-[var(--accent)] w-0 transition-all duration-300"></div>
+            </div>
+
+            <div class="flex items-center gap-2 p-2">
+                <!-- Home/Shield -->
+                <button id="shieldBtn" class="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-white/10 text-gray-400 transition-colors relative" aria-label="Privacy Shield">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                    <span id="trackerCount" class="absolute top-1 right-1 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-[var(--accent)] text-[9px] font-bold text-white hidden">0</span>
+                </button>
+
+                <!-- Address Input -->
+                <div class="flex-1 address-input h-10 rounded-xl flex items-center px-3 gap-2 relative">
+                    <div id="lockIcon" class="text-green-500">
+                        <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>
+                    </div>
+                    <input type="text" id="urlInput" class="flex-1 bg-transparent text-sm text-white placeholder-gray-500 outline-none min-w-0" placeholder="Search or type URL" autocomplete="off">
+                    
+                    <!-- Search Suggestions (Floating) -->
+                    <div id="suggestions" class="absolute top-full left-0 right-0 mt-2 bg-[#1a1a1a] border border-white/10 rounded-xl shadow-2xl overflow-hidden hidden animate-fade-in z-50">
+                        <!-- Populated by JS -->
+                    </div>
+
+                    <button id="clearInputBtn" class="hidden text-gray-500 hover:text-white"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+                </div>
+
+                <!-- Tabs & Menu -->
+                <button id="tabsBtn" class="w-10 h-10 flex flex-col items-center justify-center rounded-xl hover:bg-white/10 text-gray-400 gap-1 border border-white/10">
+                    <span id="tabCount" class="text-xs font-bold text-[var(--accent)]">1</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <main class="flex-1 relative overflow-hidden bg-black">
+            <!-- Webview Container -->
+            <div id="tabContainer" class="absolute inset-0">
+                <!-- Iframes go here -->
+            </div>
+            
+            <!-- Night Mode Overlay -->
+            <div id="nightOverlay" class="absolute inset-0 night-overlay bg-black pointer-events-none z-30 opacity-0 transition-opacity duration-300"></div>
+        </main>
+
+        <!-- Bottom Toolbar (Atlas Style) -->
+        <nav class="glass pb-[var(--safe-bottom)] shrink-0 z-40">
+            <div class="flex items-center justify-around h-14 px-2">
+                <button id="backBtn" class="p-3 text-gray-400 active:text-white rounded-full disabled:opacity-30 disabled:active:text-gray-400">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                </button>
+                
+                <button id="forwardBtn" class="p-3 text-gray-400 active:text-white rounded-full disabled:opacity-30 disabled:active:text-gray-400">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                </button>
+                
+                <button id="homeBtn" class="p-3 text-gray-400 active:text-[var(--accent)] rounded-full transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                </button>
+                
+                <div class="relative">
+                    <button id="snifferBtn" class="p-3 text-gray-400 active:text-[var(--accent)] rounded-full relative">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                    </button>
+                </div>
+
+                <button id="menuBtn" class="p-3 text-gray-400 active:text-white rounded-full">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+                </button>
+            </div>
+        </nav>
+    </div>
+
+    <!-- OVERLAYS & PANELS -->
+
+    <!-- Tabs Grid Overlay -->
+    <div id="tabsOverlay" class="fixed inset-0 bg-[#050505] z-50 transform translate-y-full transition-transform duration-300 flex flex-col">
+        <div class="glass border-b border-white/10 p-4 pt-[calc(var(--safe-top)+1rem)] flex items-center justify-between shrink-0">
+            <h2 class="text-xl font-bold bg-gradient-to-r from-white to-gray-500 bg-clip-text text-transparent">Open Tabs</h2>
+            <div class="flex gap-3">
+                <button id="closeTabsBtn" class="p-2 text-gray-400 hover:text-white bg-white/10 rounded-full">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                </button>
+            </div>
+        </div>
+        <div id="tabsGrid" class="flex-1 p-4 grid grid-cols-2 gap-4 overflow-y-auto content-start">
+            <!-- Tab Items injected here -->
+        </div>
+        <div class="glass p-4 pb-[calc(var(--safe-bottom)+1rem)] flex gap-4 shrink-0">
+            <button id="newTabBtn" class="flex-1 bg-[var(--accent)] hover:brightness-110 text-white font-semibold py-3 rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-[var(--accent)]/30">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                New Tab
+            </button>
+            <button id="newIncognitoBtn" class="flex-1 bg-gray-800 hover:bg-gray-700 text-white font-semibold py-3 rounded-xl flex items-center justify-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"/></svg>
+                Private
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Menu Panel -->
+    <div id="menuPanel" class="fixed inset-0 z-50 pointer-events-none">
+        <div id="menuBackdrop" class="absolute inset-0 bg-black/60 opacity-0 transition-opacity duration-300"></div>
+        <div id="menuContent" class="absolute bottom-0 inset-x-0 glass-panel rounded-t-3xl transform translate-y-full panel-slide pointer-events-auto pb-[var(--safe-bottom)]">
+            <div class="w-12 h-1.5 bg-gray-700 rounded-full mx-auto mt-3 mb-6"></div>
+            
+            <div class="grid grid-cols-4 gap-y-6 px-4 mb-6">
+                <button class="menu-item flex flex-col items-center gap-2 group" data-action="bookmarks">
+                    <div class="w-12 h-12 rounded-2xl bg-gray-800 group-active:scale-95 transition-transform flex items-center justify-center text-yellow-500">
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/></svg>
+                    </div>
+                    <span class="text-xs text-gray-400">Bookmarks</span>
+                </button>
+                <button class="menu-item flex flex-col items-center gap-2 group" data-action="history">
+                    <div class="w-12 h-12 rounded-2xl bg-gray-800 group-active:scale-95 transition-transform flex items-center justify-center text-blue-500">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    </div>
+                    <span class="text-xs text-gray-400">History</span>
+                </button>
+                <button class="menu-item flex flex-col items-center gap-2 group" data-action="downloads">
+                    <div class="w-12 h-12 rounded-2xl bg-gray-800 group-active:scale-95 transition-transform flex items-center justify-center text-green-500">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                    </div>
+                    <span class="text-xs text-gray-400">Downloads</span>
+                </button>
+                <button class="menu-item flex flex-col items-center gap-2 group" data-action="settings">
+                    <div class="w-12 h-12 rounded-2xl bg-gray-800 group-active:scale-95 transition-transform flex items-center justify-center text-gray-400">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    </div>
+                    <span class="text-xs text-gray-400">Settings</span>
+                </button>
+            </div>
+
+            <div class="bg-[#1a1a1a] mx-4 rounded-xl p-2 space-y-1">
+                <button class="menu-toggle w-full flex items-center justify-between p-3 rounded-lg hover:bg-white/5 active:bg-white/10" data-toggle="nightMode">
+                    <div class="flex items-center gap-3">
+                        <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+                        <span>Night Mode</span>
+                    </div>
+                    <div class="toggle-switch w-10 h-6 bg-gray-700 rounded-full relative transition-colors"><div class="dot absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-transform"></div></div>
+                </button>
+                
+                <button class="menu-toggle w-full flex items-center justify-between p-3 rounded-lg hover:bg-white/5 active:bg-white/10" data-toggle="desktopMode">
+                    <div class="flex items-center gap-3">
+                        <svg class="w-5 h-5 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                        <span>Desktop Site</span>
+                    </div>
+                    <div class="toggle-switch w-10 h-6 bg-gray-700 rounded-full relative transition-colors"><div class="dot absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-transform"></div></div>
+                </button>
+
+                <button class="menu-toggle w-full flex items-center justify-between p-3 rounded-lg hover:bg-white/5 active:bg-white/10" data-toggle="adBlock">
+                    <div class="flex items-center gap-3">
+                        <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                        <span>Ad Block</span>
+                    </div>
+                    <div class="toggle-switch w-10 h-6 bg-[var(--accent)] rounded-full relative transition-colors"><div class="dot absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-transform translate-x-4"></div></div>
+                </button>
+            </div>
+            
+            <div class="p-4">
+                <p class="text-xs text-gray-500 mb-2 font-medium ml-1">THEME COLOR</p>
+                <div class="flex gap-3 justify-between">
+                    <button class="theme-btn w-10 h-10 rounded-full bg-[#e50914] ring-2 ring-white" data-theme="red"></button>
+                    <button class="theme-btn w-10 h-10 rounded-full bg-[#3b82f6] ring-transparent" data-theme="blue"></button>
+                    <button class="theme-btn w-10 h-10 rounded-full bg-[#8b5cf6] ring-transparent" data-theme="purple"></button>
+                    <button class="theme-btn w-10 h-10 rounded-full bg-[#10b981] ring-transparent" data-theme="green"></button>
+                    <button class="theme-btn w-10 h-10 rounded-full bg-[#f97316] ring-transparent" data-theme="orange"></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Generic List Panel (Downloads/History/Bookmarks) -->
+    <div id="listPanel" class="fixed inset-y-0 right-0 w-full sm:w-96 bg-[#0a0a0a] z-50 transform translate-x-full transition-transform duration-300 flex flex-col border-l border-white/10">
+        <div class="p-4 border-b border-white/10 flex items-center justify-between pt-[calc(var(--safe-top)+1rem)]">
+            <h2 id="listPanelTitle" class="text-lg font-bold">History</h2>
+            <button id="closeListBtn" class="p-2 bg-white/10 rounded-full text-white"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+        </div>
+        <div id="listContent" class="flex-1 overflow-y-auto p-4 space-y-2"></div>
+        <div class="p-4 border-t border-white/10">
+            <button id="listClearBtn" class="w-full py-3 bg-red-900/30 text-red-500 rounded-xl font-medium hover:bg-red-900/50 transition-colors">Clear All</button>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast" class="fixed top-24 left-1/2 -translate-x-1/2 bg-[#222] border border-white/10 px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3 transform -translate-y-20 transition-all duration-300 z-[100] opacity-0">
+        <span id="toastIcon"></span>
+        <span id="toastMsg" class="text-sm font-medium"></span>
+    </div>
+
+    <script>
+        class CineBrowseEngine {
+            constructor() {
+                // Config & State
+                this.state = {
+                    tabs: [],
+                    activeTabId: null,
+                    darkMode: true,
+                    nightMode: false,
+                    desktopMode: false,
+                    adBlock: true,
+                    theme: 'red',
+                    history: JSON.parse(localStorage.getItem('cb_history') || '[]'),
+                    bookmarks: JSON.parse(localStorage.getItem('cb_bookmarks') || '[]'),
+                    downloads: JSON.parse(localStorage.getItem('cb_downloads') || '[]'),
+                    trackersBlocked: 0
+                };
+                
+                // Allowed Domains for Movies
+                this.whitelist = [
+                    'vegamovies.kg', 'uhdmovies.loan', 'moviecric.com',
+                    'katmovieshd.net', 'moviesbaba.net', 'krx18.com', 'hianimetv.su',
+                    'youtube.com', 'imdb.com', 'themoviedb.org', 'google.com',
+                    'netflix.com', 'primevideo.com'
+                ];
+
+                this.quickLinks = [
+                    { name: 'Vegamovies', url: 'https://vegamovies.tennis/', color: 'from-emerald-900 to-emerald-950' },
+                    { name: 'UHDMovies', url: 'https://uhdmovies.loan', color: 'from-blue-900 to-blue-950' },
+                    { name: 'HiAnime', url: 'https://hianimetv.su', color: 'from-pink-900 to-pink-950' },
+                    { name: '123Movies', url: 'https://freehitmovies.org/home/', color: 'from-yellow-900 to-yellow-950' },
+                    { name: 'Bolly4u', url: 'https://bolly4u.estate/', color: 'from-gray-800 to-gray-900' },
+                    { name: '9anime', url: 'https://9anime.org.lv/', color: 'from-yellow-800 to-yellow-900' },
+                    { name: 'Kat Movies HD', url: 'https://katmovieshd.net/', color: 'from-emerald-900 to-emerald-950' },
+                    { name: 'Krx18', url: 'https://krx18.com/', color: 'from-blue-900 to-blue-950' },
+                    { name: 'Kat Movies 4K', url: 'https://katmovie4k.org/', color: 'from-pink-900 to-pink-950' },
+                    { name: 'Filmyzilla', url: 'https://www.filmyzilla32.com/', color: 'from-yellow-900 to-yellow-950' },
+                    { name: 'Fmovies', url: 'https://wvv-fmovies.com/', color: 'from-gray-800 to-gray-900' },
+                    { name: 'Gogo Anime', url: 'https://gogoanimes.cv/', color: 'from-yellow-800 to-yellow-900' }
+                ];
+
+                this.dom = {};
+                this.init();
+            }
+
+            init() {
+                this.cacheDOM();
+                this.bindEvents();
+                this.loadSettings();
+                this.createTab(); // Start with one tab
+            }
+
+            cacheDOM() {
+                const id = (i) => document.getElementById(i);
+                this.dom = {
+                    app: id('app'),
+                    tabContainer: id('tabContainer'),
+                    urlInput: id('urlInput'),
+                    progressBar: id('progressBar'),
+                    tabsGrid: id('tabsGrid'),
+                    tabsOverlay: id('tabsOverlay'),
+                    menuPanel: id('menuPanel'),
+                    listPanel: id('listPanel'),
+                    nightOverlay: id('nightOverlay'),
+                    suggestions: id('suggestions'),
+                    trackerCount: id('trackerCount'),
+                    tabCount: id('tabCount'),
+                    snifferBtn: id('snifferBtn'),
+                    backBtn: id('backBtn'),
+                    forwardBtn: id('forwardBtn')
+                };
+            }
+
+            loadSettings() {
+                const savedTheme = localStorage.getItem('cb_theme') || 'red';
+                this.setTheme(savedTheme);
+                this.state.adBlock = localStorage.getItem('cb_adblock') === 'true';
+                this.updateToggleUI('adBlock', this.state.adBlock);
+            }
+
+            bindEvents() {
+                // Navigation
+                this.dom.urlInput.addEventListener('keydown', (e) => e.key === 'Enter' && this.navigate(this.dom.urlInput.value));
+                this.dom.urlInput.addEventListener('focus', () => this.dom.urlInput.select());
+                this.dom.urlInput.addEventListener('input', (e) => this.showSuggestions(e.target.value));
+                
+                // Bottom Bar
+                document.getElementById('homeBtn').onclick = () => this.goHome();
+                document.getElementById('backBtn').onclick = () => this.goBack();
+                document.getElementById('forwardBtn').onclick = () => this.goForward();
+                document.getElementById('tabsBtn').onclick = () => this.toggleTabs(true);
+                document.getElementById('closeTabsBtn').onclick = () => this.toggleTabs(false);
+                document.getElementById('newTabBtn').onclick = () => { this.createTab(); this.toggleTabs(false); };
+                document.getElementById('newIncognitoBtn').onclick = () => { this.createTab(true); this.toggleTabs(false); };
+                
+                // Menu
+                document.getElementById('menuBtn').onclick = () => this.toggleMenu(true);
+                document.getElementById('menuBackdrop').onclick = () => this.toggleMenu(false);
+                
+                // Sniffer
+                this.dom.snifferBtn.onclick = () => this.handleSnifferClick();
+
+                // Toggles
+                document.querySelectorAll('[data-toggle]').forEach(btn => {
+                    btn.onclick = () => this.toggleSetting(btn.dataset.toggle);
+                });
+
+                // Themes
+                document.querySelectorAll('.theme-btn').forEach(btn => {
+                    btn.onclick = () => this.setTheme(btn.dataset.theme);
+                });
+
+                // Menu Items
+                document.querySelectorAll('.menu-item').forEach(btn => {
+                    btn.onclick = () => {
+                        this.toggleMenu(false);
+                        this.openListPanel(btn.dataset.action);
+                    };
+                });
+
+                document.getElementById('closeListBtn').onclick = () => {
+                    this.dom.listPanel.classList.add('translate-x-full');
+                };
+
+                // Clear List
+                document.getElementById('listClearBtn').onclick = () => {
+                    const type = document.getElementById('listPanelTitle').textContent.toLowerCase();
+                    this.state[type] = [];
+                    localStorage.setItem(`cb_${type}`, '[]');
+                    this.renderListPanel(type);
+                    this.showToast(`${type} cleared`, 'trash');
+                };
+            }
+
+            // --- Core Browser Logic ---
+
+            createTab(isIncognito = false) {
+                const tabId = Date.now();
+                const tab = {
+                    id: tabId,
+                    url: '',
+                    title: 'New Tab',
+                    history: [],
+                    historyIndex: -1,
+                    isIncognito,
+                    isLoading: false
+                };
+
+                // Create Iframe Container
+                const container = document.createElement('div');
+                container.id = `tab-${tabId}`;
+                container.className = 'absolute inset-0 bg-[#050505] hidden flex-col';
+                
+                // Home Screen UI
+                const homeUI = document.createElement('div');
+                homeUI.className = 'absolute inset-0 overflow-y-auto p-6 flex flex-col items-center justify-center fade-in z-10';
+                homeUI.innerHTML = `
+                    <div class="mb-8 text-center">
+                        <div class="w-20 h-20 rounded-3xl bg-gradient-to-br ${isIncognito ? 'from-gray-800 to-gray-900' : 'from-[var(--accent)] to-black'} flex items-center justify-center shadow-2xl mb-4 mx-auto">
+                            <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        </div>
+                        <h1 class="text-3xl font-bold mb-2">${isIncognito ? 'Private' : 'CineBrowse'} <span class="text-[var(--accent)]">Pro</span></h1>
+                        <p class="text-gray-500 text-sm">Secure. Fast. Ad-Free.</p>
+                    </div>
+                    <div class="w-full max-w-md grid grid-cols-3 gap-3">
+                        ${this.quickLinks.map(link => `
+                            <button onclick="browser.navigate('${link.url}')" class="bg-gradient-to-br ${link.color} p-4 rounded-2xl flex flex-col items-center justify-center gap-2 hover:scale-105 transition-transform shadow-lg border border-white/5">
+                                <span class="text-xs font-bold truncate w-full text-center">${link.name}</span>
+                            </button>
+                        `).join('')}
+                    </div>
+                `;
+
+                // Actual Iframe
+                const iframe = document.createElement('iframe');
+                iframe.className = 'w-full h-full border-0 bg-white opacity-0 transition-opacity duration-300';
+                iframe.sandbox = "allow-scripts allow-same-origin allow-forms"; 
+                // Note: allow-same-origin needed for some sites, but careful with security in prod
+                
+                container.appendChild(homeUI);
+                container.appendChild(iframe);
+                this.dom.tabContainer.appendChild(container);
+
+                this.state.tabs.push(tab);
+                this.switchTab(tabId);
+                this.updateTabCount();
+            }
+
+            switchTab(id) {
+                // Hide current
+                if (this.state.activeTabId) {
+                    const currEl = document.getElementById(`tab-${this.state.activeTabId}`);
+                    if (currEl) currEl.classList.add('hidden');
+                    currEl.classList.remove('flex');
+                }
+
+                this.state.activeTabId = id;
+                const tab = this.getTab(id);
+                const nextEl = document.getElementById(`tab-${id}`);
+                
+                nextEl.classList.remove('hidden');
+                nextEl.classList.add('flex');
+
+                this.updateUI();
+            }
+
+            navigate(url) {
+                const tab = this.getTab();
+                let targetUrl = url;
+
+                // Simple Search Logic
+                if (!url.includes('.') || url.includes(' ')) {
+                    targetUrl = `https://vegamovies.tennis/search?q=${encodeURIComponent(url)}`;
+                } else if (!url.startsWith('http')) {
+                    targetUrl = `https://${url}`;
+                }
+
+                // Update Internal State
+                tab.history.push(targetUrl);
+                tab.historyIndex++;
+                tab.url = targetUrl;
+                tab.title = this.getDomain(targetUrl);
+
+                // Add to Global History
+                if (!tab.isIncognito) {
+                    this.addToHistory(targetUrl, tab.title);
+                }
+
+                // Simulate Loading
+                this.startLoading();
+                
+                const container = document.getElementById(`tab-${tab.id}`);
+                const iframe = container.querySelector('iframe');
+                const homeUI = container.firstElementChild; // homeUI div
+
+                homeUI.style.display = 'none';
+                iframe.src = targetUrl;
+                iframe.classList.remove('opacity-0');
+
+                // Update UI
+                this.dom.urlInput.value = targetUrl;
+                this.updateUI();
+                
+                // Simulate Tracker Blocking
+                this.simulatePrivacy(targetUrl);
+            }
+
+            // --- Features ---
+
+            simulatePrivacy(url) {
+                const trackers = Math.floor(Math.random() * 15);
+                this.state.trackersBlocked += trackers;
+                
+                const badge = this.dom.trackerCount;
+                badge.textContent = trackers;
+                badge.classList.remove('hidden');
+                badge.classList.add('animate-pulse'); // Pulse effect
+                
+                // Reset pulse
+                setTimeout(() => badge.classList.remove('animate-pulse'), 2000);
+            }
+
+            handleSnifferClick() {
+                const tab = this.getTab();
+                if (!tab.url) return;
+
+                this.showToast('Scanning media...', 'search');
+                
+                setTimeout(() => {
+                    this.state.downloads.push({
+                        title: tab.title + ' (Video)',
+                        url: tab.url,
+                        date: new Date().toLocaleDateString(),
+                        size: '450 MB'
+                    });
+                    localStorage.setItem('cb_downloads', JSON.stringify(this.state.downloads));
+                    this.showToast('Download started', 'download');
+                    this.dom.snifferBtn.classList.remove('sniffer-active');
+                }, 1500);
+            }
+
+            toggleSetting(key) {
+                if (key === 'nightMode') {
+                    this.state.nightMode = !this.state.nightMode;
+                    this.dom.nightOverlay.style.opacity = this.state.nightMode ? '1' : '0';
+                } else {
+                    this.state[key] = !this.state[key];
+                    if (key === 'adBlock') localStorage.setItem('cb_adblock', this.state[key]);
+                }
+                this.updateToggleUI(key, this.state[key]);
+            }
+
+            updateToggleUI(key, isActive) {
+                const btn = document.querySelector(`[data-toggle="${key}"] .toggle-switch .dot`);
+                const track = document.querySelector(`[data-toggle="${key}"] .toggle-switch`);
+                if (!btn || !track) return;
+
+                if (isActive) {
+                    btn.classList.add('translate-x-4');
+                    track.classList.add('bg-[var(--accent)]');
+                    track.classList.remove('bg-gray-700');
+                } else {
+                    btn.classList.remove('translate-x-4');
+                    track.classList.remove('bg-[var(--accent)]');
+                    track.classList.add('bg-gray-700');
+                }
+            }
+
+            setTheme(colorName) {
+                document.body.className = `theme-${colorName}`;
+                this.state.theme = colorName;
+                localStorage.setItem('cb_theme', colorName);
+                
+                // Update active indicators in menu
+                document.querySelectorAll('.theme-btn').forEach(b => {
+                    if (b.dataset.theme === colorName) b.classList.add('ring-2', 'ring-white', 'ring-offset-2', 'ring-offset-gray-900');
+                    else b.classList.remove('ring-2', 'ring-white', 'ring-offset-2', 'ring-offset-gray-900');
+                });
+            }
+
+            // --- UI Helpers ---
+
+            updateUI() {
+                const tab = this.getTab();
+                this.dom.urlInput.value = tab.url;
+                
+                // Nav Buttons
+                this.dom.backBtn.disabled = tab.historyIndex <= 0;
+                this.dom.forwardBtn.disabled = tab.historyIndex >= tab.history.length - 1;
+
+                // Randomly activate sniffer on video sites
+                const isVideoSite = ['youtube', 'vegamovies', 'netflix'].some(s => tab.url.includes(s));
+                if (isVideoSite) this.dom.snifferBtn.classList.add('sniffer-active', 'text-[var(--accent)]');
+                else this.dom.snifferBtn.classList.remove('sniffer-active', 'text-[var(--accent)]');
+            }
+
+            toggleTabs(show) {
+                if (show) {
+                    this.renderTabsGrid();
+                    this.dom.tabsOverlay.classList.remove('translate-y-full');
+                } else {
+                    this.dom.tabsOverlay.classList.add('translate-y-full');
+                }
+            }
+
+            renderTabsGrid() {
+                this.dom.tabsGrid.innerHTML = this.state.tabs.map(tab => `
+                    <div onclick="browser.switchTab(${tab.id}); browser.toggleTabs(false)" 
+                        class="tab-grid-item relative aspect-[4/5] bg-[#1a1a1a] rounded-2xl overflow-hidden border ${tab.id === this.state.activeTabId ? 'border-[var(--accent)]' : 'border-white/10'}">
+                        <div class="absolute inset-0 p-4 flex flex-col">
+                            <div class="flex items-center gap-2 mb-2">
+                                <div class="w-2 h-2 rounded-full ${tab.isIncognito ? 'bg-purple-500' : 'bg-gray-500'}"></div>
+                                <span class="text-xs font-bold text-gray-400 truncate flex-1">${tab.title || 'New Tab'}</span>
+                                <button onclick="event.stopPropagation(); browser.closeTab(${tab.id})" class="p-1 hover:bg-white/10 rounded-full">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                                </button>
+                            </div>
+                            <div class="flex-1 bg-white/5 rounded-xl w-full"></div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            closeTab(id) {
+                if (this.state.tabs.length === 1) {
+                    this.createTab(); // Don't leave empty
+                }
+                this.state.tabs = this.state.tabs.filter(t => t.id !== id);
+                document.getElementById(`tab-${id}`)?.remove();
+                
+                if (this.state.activeTabId === id) {
+                    this.switchTab(this.state.tabs[this.state.tabs.length - 1].id);
+                }
+                this.renderTabsGrid();
+                this.updateTabCount();
+            }
+
+            toggleMenu(show) {
+                const backdrop = document.getElementById('menuBackdrop');
+                const content = document.getElementById('menuContent');
+                
+                if (show) {
+                    this.dom.menuPanel.classList.remove('pointer-events-none');
+                    backdrop.classList.remove('opacity-0');
+                    content.classList.remove('translate-y-full');
+                } else {
+                    this.dom.menuPanel.classList.add('pointer-events-none');
+                    backdrop.classList.add('opacity-0');
+                    content.classList.add('translate-y-full');
+                }
+            }
+
+            openListPanel(type) {
+                const titleMap = { bookmarks: 'Bookmarks', history: 'History', downloads: 'Downloads', settings: 'Settings' };
+                document.getElementById('listPanelTitle').textContent = titleMap[type];
+                this.renderListPanel(type);
+                this.dom.listPanel.classList.remove('translate-x-full');
+            }
+
+            renderListPanel(type) {
+                const container = document.getElementById('listContent');
+                container.innerHTML = '';
+                
+                const data = this.state[type];
+                if (!data || data.length === 0) {
+                    container.innerHTML = `<div class="text-center text-gray-500 mt-10">No items found</div>`;
+                    return;
+                }
+
+                if (type === 'downloads') {
+                    container.innerHTML = data.map(item => `
+                        <div class="bg-white/5 p-3 rounded-xl flex items-center gap-3">
+                            <div class="w-10 h-10 bg-green-900/30 rounded-lg flex items-center justify-center text-green-500">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-sm font-medium truncate">${item.title}</p>
+                                <p class="text-xs text-gray-500">${item.size} • ${item.date}</p>
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    // History / Bookmarks
+                    container.innerHTML = data.map(item => `
+                        <div onclick="browser.navigate('${item.url}'); browser.dom.listPanel.classList.add('translate-x-full')" class="p-3 hover:bg-white/5 rounded-xl cursor-pointer">
+                            <p class="text-sm font-medium truncate text-blue-400">${item.title}</p>
+                            <p class="text-xs text-gray-500 truncate">${item.url}</p>
+                        </div>
+                    `).join('');
+                }
+            }
+
+            // --- Utilities ---
+
+            getTab(id) {
+                return id ? this.state.tabs.find(t => t.id === id) : this.state.tabs.find(t => t.id === this.state.activeTabId);
+            }
+
+            updateTabCount() {
+                this.dom.tabCount.textContent = this.state.tabs.length;
+            }
+
+            startLoading() {
+                this.dom.progressBar.style.width = '0%';
+                this.dom.progressBar.style.opacity = '1';
+                setTimeout(() => this.dom.progressBar.classList.add('animate-progress'), 50);
+                setTimeout(() => {
+                    this.dom.progressBar.classList.remove('animate-progress');
+                    this.dom.progressBar.style.width = '100%';
+                    setTimeout(() => this.dom.progressBar.style.opacity = '0', 200);
+                }, 1500);
+            }
+
+            addToHistory(url, title) {
+                // Prevent duplicates at top
+                if (this.state.history[0]?.url === url) return;
+                this.state.history.unshift({ url, title, date: new Date().toLocaleDateString() });
+                if (this.state.history.length > 50) this.state.history.pop();
+                localStorage.setItem('cb_history', JSON.stringify(this.state.history));
+            }
+
+            getDomain(url) {
+                try { return new URL(url).hostname.replace('www.', ''); } catch { return url; }
+            }
+
+            goBack() {
+                const tab = this.getTab();
+                if (tab.historyIndex > 0) {
+                    tab.historyIndex--;
+                    this.navigateInternal(tab.history[tab.historyIndex]);
+                }
+            }
+
+            goForward() {
+                const tab = this.getTab();
+                if (tab.historyIndex < tab.history.length - 1) {
+                    tab.historyIndex++;
+                    this.navigateInternal(tab.history[tab.historyIndex]);
+                }
+            }
+            
+            goHome() {
+                const tab = this.getTab();
+                tab.url = '';
+                tab.title = 'New Tab';
+                this.dom.urlInput.value = '';
+                
+                const container = document.getElementById(`tab-${tab.id}`);
+                container.firstElementChild.style.display = 'flex'; // Show Home UI
+                container.querySelector('iframe').classList.add('opacity-0');
+            }
+
+            navigateInternal(url) {
+                // Internal nav without adding to history stack
+                const container = document.getElementById(`tab-${this.state.activeTabId}`);
+                const iframe = container.querySelector('iframe');
+                iframe.src = url;
+                this.dom.urlInput.value = url;
+                this.updateUI();
+            }
+
+            showSuggestions(val) {
+                if (val.length < 2) {
+                    this.dom.suggestions.classList.add('hidden');
+                    return;
+                }
+                
+                // Simulated suggestions
+                const matches = this.whitelist.filter(d => d.includes(val)).slice(0, 3);
+                if (matches.length > 0) {
+                    this.dom.suggestions.innerHTML = matches.map(m => `
+                        <div onclick="browser.navigate('${m}')" class="p-3 hover:bg-white/10 cursor-pointer text-sm text-gray-300 flex items-center gap-2">
+                            <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                            ${m}
+                        </div>
+                    `).join('');
+                    this.dom.suggestions.classList.remove('hidden');
+                } else {
+                    this.dom.suggestions.classList.add('hidden');
+                }
+            }
+
+            showToast(msg, iconType) {
+                const toast = document.getElementById('toast');
+                const icons = {
+                    download: '<svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>',
+                    trash: '<svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>',
+                    search: '<svg class="w-5 h-5 text-blue-500 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>'
+                };
+                
+                document.getElementById('toastIcon').innerHTML = icons[iconType] || '';
+                document.getElementById('toastMsg').textContent = msg;
+                
+                toast.classList.remove('opacity-0', '-translate-y-20');
+                
+                setTimeout(() => {
+                    toast.classList.add('opacity-0', '-translate-y-20');
+                }, 2500);
+            }
+        }
+
+        // Initialize App
+        const browser = new CineBrowseEngine();
+    </script>
+</body>
+</html>
