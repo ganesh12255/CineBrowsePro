@@ -1,65 +1,1251 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="theme-color" content="#000000">
-    <meta name="theme-color" content="#e50914">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black">
-    <link rel="manifest" href="/manifest.json">
-    <link rel="icon" type="image/png+xml" href="/favicon.png">
-    <link rel="apple-touch-icon" href="/favicon.png">
-    <meta name="cloudflare-verification" content="8a861d2ee5bb72a0d2631a62dace8e6d">
-    <meta name="google-site-verification" content="_ZOlojyfi57t_1JiYjriSqBmjrmxmfkaJgiD5arwROY" />
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="google-adsense-account" content="ca-pub-6717991994380790">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="description" content="CineBrowse Pro - Advanced Movie Browser">
-    <title>CineBrowse Pro - Watch movies, Animes and Webserie</title>
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <!-- Google Tag Manager -->
-    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-     new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-     j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-     })(window,document,'script','dataLayer','GTM-KW32RNC8');</script>
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6717991994380790"
-     crossorigin="anonymous"></script>
-<!-- End Google Tag Manager -->
-    <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-1VRPBZ4F1E"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-1VRPBZ4F1E');
-</script>
-    <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-E94W4L63BJ"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-E94W4L63BJ');
-</script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CineBrowse Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        * {
-            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-            -webkit-tap-highlight-color: transparent;
-            -webkit-touch-callout: none;
-            box-sizing: border-box;
-        }
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
 
         :root {
-            --accent: #e50914; /* Default Red */
-            --bg-dark: #050505;
-            --bg-panel: #121212;
+            --cb-dark: #050505;
+            --cb-darker: #000000;
+            --cb-red: #8b0000;
+            --cb-red-light: #dc2626;
+            --cb-glass: rgba(255, 255, 255, 0.03);
+            --cb-glass-hover: rgba(255, 255, 255, 0.08);
+            --cb-border: rgba(255, 255, 255, 0.08);
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--cb-darker);
+            color: white;
+            overflow: hidden; /* Prevent body scroll, handle in browser view */
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Glassmorphism utilities */
+        .glass {
+            background: var(--cb-glass);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--cb-border);
+        }
+        
+        .glass-panel {
+            background: rgba(10, 10, 10, 0.85);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(139, 0, 0, 0.3);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        .glass-red {
+            background: linear-gradient(135deg, rgba(139,0,0,0.8) 0%, rgba(69,0,0,0.9) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--cb-red);
+        }
+
+        /* Tab Animations */
+        .tab-enter {
+            animation: slideIn 0.2s ease-out forwards;
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Loader */
+        #page-loader {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 2px;
+            background: var(--cb-red-light);
+            width: 0%;
+            transition: width 0.3s ease, opacity 0.3s ease;
+            box-shadow: 0 0 10px var(--cb-red-light);
+            z-index: 50;
+        }
+
+        .view-container {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            display: none;
+            background-color: var(--cb-dark);
+        }
+        .view-container.active {
+            display: block;
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: white; /* Most sites assume white bg */
+        }
+
+        /* Gradient Text */
+        .text-gradient {
+            background: linear-gradient(to right, #fff, #a3a3a3);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .text-gradient-red {
+            background: linear-gradient(to right, #ff4d4d, #8b0000);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Animations */
+        .pulse-slow {
+            animation: pulse 3s infinite;
+        }
+    </style>
+</head>
+<body class="flex flex-col h-screen w-full">
+
+    <!-- Browser Chrome (Header) -->
+    <header class="flex flex-col w-full z-40 relative select-none">
+        
+        <!-- Window Controls & Tabs -->
+        <div class="flex items-end px-2 pt-2 pb-0 bg-gradient-to-b from-black to-[#0a0a0a] border-b border-white/5">
+            <!-- Window Mock Controls -->
+            <div class="flex gap-2 items-center px-3 pb-2 hidden sm:flex">
+                <div class="w-3 h-3 rounded-full bg-red-500/80 hover:bg-red-500 cursor-pointer"></div>
+                <div class="w-3 h-3 rounded-full bg-yellow-500/80 hover:bg-yellow-500 cursor-pointer"></div>
+                <div class="w-3 h-3 rounded-full bg-green-500/80 hover:bg-green-500 cursor-pointer"></div>
+            </div>
+
+            <!-- Tabs Container -->
+            <div id="tabs-container" class="flex flex-1 overflow-x-auto gap-1 px-2 items-end no-scrollbar hide-scroll">
+                <!-- Tabs injected by JS -->
+            </div>
+
+            <!-- New Tab Btn -->
+            <button id="btn-new-tab" class="p-2 mb-1 ml-1 text-gray-400 hover:text-white hover:bg-white/10 rounded-lg transition-colors" title="New Tab">
+                <i data-lucide="plus" class="w-4 h-4"></i>
+            </button>
+        </div>
+
+        <!-- Navigation Bar -->
+        <div class="flex items-center px-2 py-2 gap-2 glass relative">
+            <!-- Nav Controls -->
+            <div class="flex items-center gap-1">
+                <button id="btn-back" class="p-2 text-gray-400 hover:text-white hover:bg-white/10 rounded-lg transition-colors disabled:opacity-30 disabled:hover:bg-transparent cursor-pointer" title="Back">
+                    <i data-lucide="arrow-left" class="w-4 h-4"></i>
+                </button>
+                <button id="btn-forward" class="p-2 text-gray-400 hover:text-white hover:bg-white/10 rounded-lg transition-colors disabled:opacity-30 disabled:hover:bg-transparent cursor-pointer" title="Forward">
+                    <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                </button>
+                <button id="btn-refresh" class="p-2 text-gray-400 hover:text-white hover:bg-white/10 rounded-lg transition-colors cursor-pointer" title="Reload">
+                    <i data-lucide="rotate-cw" class="w-4 h-4"></i>
+                </button>
+                <button id="btn-home" class="p-2 text-gray-400 hover:text-white hover:bg-white/10 rounded-lg transition-colors cursor-pointer hidden sm:block" title="Home">
+                    <i data-lucide="home" class="w-4 h-4"></i>
+                </button>
+            </div>
+
+            <!-- Smart Address Bar -->
+            <div class="flex-1 flex items-center bg-black/50 border border-white/10 rounded-full px-3 py-1.5 focus-within:border-red-700/50 focus-within:ring-1 focus-within:ring-red-700/50 transition-all group shadow-inner">
+                
+                <div id="security-icon" class="text-green-500 mr-2" title="Secure Connection">
+                    <i data-lucide="lock" class="w-4 h-4"></i>
+                </div>
+
+                <input type="text" id="address-input" class="flex-1 bg-transparent border-none outline-none text-sm text-gray-200 placeholder-gray-500 w-full" placeholder="Search the web or enter URL..." autocomplete="off" spellcheck="false">
+
+                <!-- Address Bar Actions -->
+                <div class="flex items-center gap-1 text-gray-400">
+                    <button id="btn-voice" class="p-1 hover:text-white hover:bg-white/10 rounded-full transition-colors cursor-pointer" title="Voice Search">
+                        <i data-lucide="mic" class="w-4 h-4"></i>
+                    </button>
+                    <button id="btn-bookmark" class="p-1 hover:text-yellow-400 hover:bg-white/10 rounded-full transition-colors cursor-pointer" title="Bookmark this page">
+                        <i data-lucide="star" class="w-4 h-4"></i>
+                    </button>
+                    <button id="btn-adblock" class="p-1 text-red-400 hover:text-red-300 hover:bg-white/10 rounded-full transition-colors cursor-pointer flex items-center gap-1" title="Ad-Block Active">
+                        <i data-lucide="shield-check" class="w-4 h-4"></i>
+                        <span class="text-[10px] font-bold hidden md:inline">12</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Extensions / Menus -->
+            <div class="flex items-center gap-1 ml-1">
+                <button id="btn-ai" class="p-2 text-red-400 hover:text-white hover:bg-red-900/50 rounded-lg transition-colors cursor-pointer relative group" title="Cine AI Assistant">
+                    <i data-lucide="cpu" class="w-5 h-5"></i>
+                    <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
+                </button>
+                <button id="btn-menu" class="p-2 text-gray-400 hover:text-white hover:bg-white/10 rounded-lg transition-colors cursor-pointer" title="Menu">
+                    <i data-lucide="more-vertical" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <!-- Loading indicator -->
+            <div id="page-loader"></div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 relative w-full h-full bg-[#050505] overflow-hidden">
+        <!-- Views Container (Iframes & Dashboards go here) -->
+        <div id="views-container" class="w-full h-full relative">
+            <!-- Dynamically populated by JS -->
+        </div>
+
+        <!-- Overlays -->
+
+        <!-- Main Menu -->
+        <div id="main-menu" class="absolute top-2 right-2 w-72 glass-panel rounded-2xl shadow-2xl z-50 transform scale-95 opacity-0 pointer-events-none transition-all duration-200 origin-top-right flex flex-col p-2 text-sm">
+            <div class="p-3 border-b border-white/10 mb-2">
+                <h3 class="text-white font-semibold">CineBrowse Pro</h3>
+                <p class="text-gray-400 text-xs mt-1">Browse Everything. Experience Premium.</p>
+            </div>
+            
+            <button class="menu-item flex items-center gap-3 w-full p-2.5 rounded-xl hover:bg-white/10 text-gray-200 transition-colors" onclick="cineBrowser.openNewTab()">
+                <i data-lucide="plus-square" class="w-4 h-4 text-gray-400"></i> New Tab
+            </button>
+            <button class="menu-item flex items-center gap-3 w-full p-2.5 rounded-xl hover:bg-white/10 text-gray-200 transition-colors" onclick="cineBrowser.openNewTab(true)">
+                <i data-lucide="glasses" class="w-4 h-4 text-gray-400"></i> New Incognito Window
+            </button>
+            <div class="h-px bg-white/10 my-1 mx-2"></div>
+            <button class="menu-item flex items-center gap-3 w-full p-2.5 rounded-xl hover:bg-white/10 text-gray-200 transition-colors" onclick="cineBrowser.showHistory()">
+                <i data-lucide="history" class="w-4 h-4 text-gray-400"></i> History
+            </button>
+            <button class="menu-item flex items-center gap-3 w-full p-2.5 rounded-xl hover:bg-white/10 text-gray-200 transition-colors" onclick="cineBrowser.showBookmarks()">
+                <i data-lucide="bookmark" class="w-4 h-4 text-gray-400"></i> Bookmarks
+            </button>
+            <button class="menu-item flex items-center gap-3 w-full p-2.5 rounded-xl hover:bg-white/10 text-gray-200 transition-colors" onclick="cineBrowser.simulateDownload()">
+                <i data-lucide="download" class="w-4 h-4 text-gray-400"></i> Downloads
+            </button>
+            <div class="h-px bg-white/10 my-1 mx-2"></div>
+            <button class="menu-item flex items-center justify-between w-full p-2.5 rounded-xl hover:bg-white/10 text-gray-200 transition-colors" onclick="cineBrowser.toggleZoom()">
+                <div class="flex items-center gap-3">
+                    <i data-lucide="zoom-in" class="w-4 h-4 text-gray-400"></i> Zoom
+                </div>
+                <span class="text-xs bg-white/10 px-2 py-1 rounded">100%</span>
+            </button>
+            <button class="menu-item flex items-center gap-3 w-full p-2.5 rounded-xl hover:bg-white/10 text-gray-200 transition-colors" onclick="window.print()">
+                <i data-lucide="printer" class="w-4 h-4 text-gray-400"></i> Print...
+            </button>
+            <button class="menu-item flex items-center gap-3 w-full p-2.5 rounded-xl hover:bg-white/10 text-gray-200 transition-colors" onclick="cineBrowser.findInPage()">
+                <i data-lucide="search" class="w-4 h-4 text-gray-400"></i> Find in page
+            </button>
+            <button class="menu-item flex items-center gap-3 w-full p-2.5 rounded-xl hover:bg-white/10 text-gray-200 transition-colors" onclick="cineBrowser.translatePage()">
+                <i data-lucide="languages" class="w-4 h-4 text-gray-400"></i> Translate
+            </button>
+            <div class="h-px bg-white/10 my-1 mx-2"></div>
+            <button class="menu-item flex items-center gap-3 w-full p-2.5 rounded-xl hover:bg-white/10 text-gray-200 transition-colors" onclick="cineBrowser.openDevTools()">
+                <i data-lucide="code" class="w-4 h-4 text-gray-400"></i> Developer Tools
+            </button>
+            <button class="menu-item flex items-center gap-3 w-full p-2.5 rounded-xl hover:bg-white/10 text-gray-200 transition-colors" onclick="cineBrowser.showSettings()">
+                <i data-lucide="settings" class="w-4 h-4 text-gray-400"></i> Settings
+            </button>
+        </div>
+
+        <!-- AI Assistant Panel -->
+        <div id="ai-panel" class="absolute top-0 right-0 h-full w-80 glass-panel border-r-0 border-t-0 border-b-0 shadow-2xl z-40 transform translate-x-full transition-transform duration-300 flex flex-col">
+            <div class="p-4 border-b border-white/10 flex items-center justify-between glass-red rounded-tl-2xl">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="cpu" class="w-5 h-5 text-white"></i>
+                    <h3 class="text-white font-semibold">Cine AI</h3>
+                </div>
+                <button onclick="cineBrowser.toggleAI()" class="text-white/70 hover:text-white">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div id="ai-chat-area" class="flex-1 overflow-y-auto p-4 flex flex-col gap-3 custom-scrollbar">
+                <div class="bg-white/5 rounded-2xl rounded-tl-sm p-3 border border-white/5 text-sm text-gray-200 w-[85%]">
+                    Hello! I'm your premium browsing assistant. I can summarize pages, translate text, or answer questions. How can I help you today?
+                </div>
+            </div>
+            <div class="p-3 border-t border-white/10 bg-black/40">
+                <form id="ai-form" class="flex items-center gap-2" onsubmit="event.preventDefault(); cineBrowser.sendAIMessage();">
+                    <input type="text" id="ai-input" class="flex-1 bg-white/5 border border-white/10 rounded-full px-4 py-2 text-sm text-white focus:outline-none focus:border-red-500/50" placeholder="Ask Cine AI...">
+                    <button type="submit" class="p-2 bg-red-800 hover:bg-red-700 text-white rounded-full transition-colors">
+                        <i data-lucide="send" class="w-4 h-4"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Dev Tools Panel (Source Code) -->
+        <div id="dev-panel" class="absolute bottom-0 left-0 w-full h-1/2 glass-panel border-l-0 border-r-0 border-b-0 shadow-2xl z-40 transform translate-y-full transition-transform duration-300 flex flex-col font-mono">
+            <div class="p-2 border-b border-white/10 flex items-center justify-between bg-black/80">
+                <div class="flex items-center gap-4">
+                    <div class="flex items-center gap-2 text-red-400">
+                        <i data-lucide="terminal" class="w-4 h-4"></i>
+                        <span class="text-xs font-bold tracking-wider">DEV MODE</span>
+                    </div>
+                    <div class="flex gap-3 text-xs text-gray-400">
+                        <button class="hover:text-white border-b border-red-500 text-white">Elements</button>
+                        <button class="hover:text-white">Console</button>
+                        <button class="hover:text-white">Network</button>
+                    </div>
+                </div>
+                <button onclick="cineBrowser.closeDevTools()" class="text-gray-400 hover:text-white">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+            <div class="flex-1 bg-[#0a0a0a] overflow-auto p-4 text-xs text-green-400" id="dev-source-content">
+                <!-- Source code loaded here -->
+                <div class="animate-pulse text-gray-500">Loading source mapping...</div>
+            </div>
+        </div>
+
+        <!-- Password Prompt Modal -->
+        <div id="password-prompt" class="absolute top-4 right-4 glass-panel border border-red-900/50 rounded-xl p-4 shadow-2xl z-50 transform translate-y-[-20px] opacity-0 pointer-events-none transition-all duration-300 w-80">
+            <div class="flex gap-3">
+                <div class="bg-red-900/30 p-2 rounded-lg h-fit text-red-400">
+                    <i data-lucide="key" class="w-5 h-5"></i>
+                </div>
+                <div>
+                    <h4 class="text-white font-medium text-sm">Save password?</h4>
+                    <p class="text-gray-400 text-xs mt-1 mb-3">Do you want CineBrowse to save the password for this site?</p>
+                    <div class="flex gap-2">
+                        <button onclick="cineBrowser.hidePasswordPrompt()" class="px-3 py-1.5 bg-red-800 hover:bg-red-700 text-white text-xs rounded-lg transition-colors flex-1">Save</button>
+                        <button onclick="cineBrowser.hidePasswordPrompt()" class="px-3 py-1.5 bg-white/5 hover:bg-white/10 text-white text-xs rounded-lg transition-colors flex-1">Never</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Notification Toast -->
+        <div id="toast" class="absolute bottom-8 left-1/2 transform -translate-x-1/2 bg-black/90 border border-white/10 text-white px-4 py-2 rounded-full text-sm shadow-2xl z-50 transition-all duration-300 opacity-0 pointer-events-none translate-y-4 flex items-center gap-2">
+            <i data-lucide="info" class="w-4 h-4 text-red-400"></i>
+            <span id="toast-msg">Notification</span>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-black border-t border-white/5 py-1 px-4 flex justify-between items-center text-[10px] text-gray-500 z-50 relative select-none">
+        <div class="flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-green-500 inline-block animate-pulse"></span>
+            System Online
+        </div>
+        <div class="text-center">Crafted by Gaku media.</div>
+        <div>CineBrowse Pro v1.0.0</div>
+    </footer>
+
+    <!-- HTML Templates -->
+    
+    <!-- Template for Dashboard (New Tab) -->
+    <template id="tpl-dashboard">
+        <div class="w-full h-full flex flex-col items-center justify-center overflow-y-auto bg-gradient-to-b from-[#0a0a0a] to-black relative pb-20">
+            
+            <!-- Background Decoration -->
+            <div class="absolute top-1/4 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-red-900/10 rounded-full blur-[100px] pointer-events-none"></div>
+
+            <div class="max-w-4xl w-full px-6 flex flex-col items-center z-10 animate-[slideIn_0.5s_ease-out]">
+                
+                <!-- Logo -->
+                <div class="mb-8 flex flex-col items-center">
+                    <div class="w-20 h-20 glass-red rounded-2xl flex items-center justify-center mb-4 shadow-[0_0_30px_rgba(139,0,0,0.3)]">
+                        <i data-lucide="globe" class="w-10 h-10 text-white"></i>
+                    </div>
+                    <h1 class="text-5xl font-bold tracking-tight text-gradient mb-2">CineBrowse <span class="text-gradient-red">Pro</span></h1>
+                    <p class="text-gray-400 text-sm tracking-widest uppercase">Browse Everything. Experience Premium.</p>
+                </div>
+
+                <!-- Dashboard Search -->
+                <div class="w-full max-w-2xl relative mb-12 group">
+                    <div class="absolute inset-0 bg-red-600/20 blur-xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    <form onsubmit="event.preventDefault(); cineBrowser.handleDashboardSearch(this);" class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                            <i data-lucide="search" class="w-5 h-5 text-gray-400"></i>
+                        </div>
+                        <input type="text" name="q" class="w-full bg-white/5 border border-white/10 rounded-full py-4 pl-12 pr-12 text-white placeholder-gray-500 focus:outline-none focus:border-red-500/50 focus:bg-white/10 transition-all shadow-xl text-lg backdrop-blur-md" placeholder="Search the web or type a URL...">
+                        <button type="button" class="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-white transition-colors">
+                            <i data-lucide="mic" class="w-5 h-5"></i>
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Quick Access Grid -->
+                <div class="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 gap-4 w-full max-w-3xl mb-12">
+                    <!-- Google -->
+                    <button onclick="cineBrowser.navigate('https://www.google.com/search?igu=1')" class="flex flex-col items-center gap-2 group p-4 rounded-2xl hover:bg-white/5 transition-all">
+                        <div class="w-14 h-14 bg-white/10 rounded-xl flex items-center justify-center group-hover:bg-white/20 group-hover:scale-110 transition-all border border-white/5 shadow-lg">
+                            <i data-lucide="search" class="w-6 h-6 text-blue-400"></i>
+                        </div>
+                        <span class="text-xs text-gray-400 group-hover:text-white transition-colors">Google</span>
+                    </button>
+                    <!-- Bing -->
+                    <button onclick="cineBrowser.navigate('https://www.bing.com/')" class="flex flex-col items-center gap-2 group p-4 rounded-2xl hover:bg-white/5 transition-all">
+                        <div class="w-14 h-14 bg-white/10 rounded-xl flex items-center justify-center group-hover:bg-white/20 group-hover:scale-110 transition-all border border-white/5 shadow-lg">
+                            <i data-lucide="layout-grid" class="w-6 h-6 text-teal-400"></i>
+                        </div>
+                        <span class="text-xs text-gray-400 group-hover:text-white transition-colors">Bing</span>
+                    </button>
+                    <!-- Wikipedia -->
+                    <button onclick="cineBrowser.navigate('https://en.wikipedia.org')" class="flex flex-col items-center gap-2 group p-4 rounded-2xl hover:bg-white/5 transition-all">
+                        <div class="w-14 h-14 bg-white/10 rounded-xl flex items-center justify-center group-hover:bg-white/20 group-hover:scale-110 transition-all border border-white/5 shadow-lg">
+                            <i data-lucide="book" class="w-6 h-6 text-gray-300"></i>
+                        </div>
+                        <span class="text-xs text-gray-400 group-hover:text-white transition-colors">Wikipedia</span>
+                    </button>
+                    <!-- ChatGPT (Mock) -->
+                    <button onclick="cineBrowser.navigate('cine://chatgpt')" class="flex flex-col items-center gap-2 group p-4 rounded-2xl hover:bg-white/5 transition-all">
+                        <div class="w-14 h-14 bg-[#10a37f]/20 rounded-xl flex items-center justify-center group-hover:bg-[#10a37f]/30 group-hover:scale-110 transition-all border border-[#10a37f]/30 shadow-lg">
+                            <i data-lucide="bot" class="w-6 h-6 text-[#10a37f]"></i>
+                        </div>
+                        <span class="text-xs text-gray-400 group-hover:text-white transition-colors">ChatGPT</span>
+                    </button>
+                    <!-- Instagram (Mock) -->
+                    <button onclick="cineBrowser.navigate('cine://instagram')" class="flex flex-col items-center gap-2 group p-4 rounded-2xl hover:bg-white/5 transition-all">
+                        <div class="w-14 h-14 bg-gradient-to-tr from-yellow-400 via-red-500 to-purple-500 rounded-xl flex items-center justify-center group-hover:scale-110 transition-all opacity-80 group-hover:opacity-100 shadow-lg">
+                            <i data-lucide="instagram" class="w-6 h-6 text-white"></i>
+                        </div>
+                        <span class="text-xs text-gray-400 group-hover:text-white transition-colors">Instagram</span>
+                    </button>
+                    <!-- Settings -->
+                    <button onclick="cineBrowser.showSettings()" class="flex flex-col items-center gap-2 group p-4 rounded-2xl hover:bg-white/5 transition-all">
+                        <div class="w-14 h-14 bg-white/10 rounded-xl flex items-center justify-center group-hover:bg-white/20 group-hover:scale-110 transition-all border border-white/5 shadow-lg">
+                            <i data-lucide="settings" class="w-6 h-6 text-gray-400"></i>
+                        </div>
+                        <span class="text-xs text-gray-400 group-hover:text-white transition-colors">Settings</span>
+                    </button>
+                </div>
+
+                <!-- Custom Dashboard Widgets -->
+                <div class="w-full max-w-4xl grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Recent History Widget -->
+                    <div class="glass p-5 rounded-2xl flex flex-col h-48">
+                        <div class="flex items-center gap-2 mb-4 text-gray-300 font-medium">
+                            <i data-lucide="history" class="w-4 h-4"></i> Recent Activity
+                        </div>
+                        <div id="dash-history" class="flex-1 overflow-y-auto space-y-2 text-sm text-gray-400 custom-scrollbar pr-2">
+                            <!-- Populated by JS -->
+                            <div class="text-center text-xs text-gray-600 mt-8">No recent activity</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Trending News Widget -->
+                    <div class="glass p-5 rounded-2xl flex flex-col h-48 relative overflow-hidden group">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent z-0"></div>
+                        <div class="relative z-10 flex items-center justify-between mb-4 text-gray-300 font-medium">
+                            <div class="flex items-center gap-2"><i data-lucide="trending-up" class="w-4 h-4 text-red-400"></i> Tech Trends</div>
+                            <span class="text-[10px] bg-red-900/50 text-red-200 px-2 py-1 rounded">LIVE</span>
+                        </div>
+                        <div class="relative z-10 space-y-3">
+                            <div class="cursor-pointer hover:text-white transition-colors">
+                                <h4 class="text-sm font-semibold text-gray-200">The Future of AI Browsing</h4>
+                                <p class="text-xs text-gray-500 mt-1">CineBrowse Pro introduces next-gen capabilities.</p>
+                            </div>
+                            <div class="cursor-pointer hover:text-white transition-colors">
+                                <h4 class="text-sm font-semibold text-gray-200">Web3 and the New Internet</h4>
+                                <p class="text-xs text-gray-500 mt-1">How decentralized web is shaping tomorrow.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </template>
+
+    <!-- Template for Internal Pages (Settings, History, Bookmarks, Mocks) -->
+    <template id="tpl-internal-page">
+        <div class="w-full h-full bg-[#0a0a0a] text-white overflow-y-auto p-8 custom-scrollbar">
+            <div class="max-w-3xl mx-auto glass p-8 rounded-2xl border-red-900/30">
+                <h1 class="text-3xl font-bold mb-6 flex items-center gap-3 text-red-500 border-b border-white/10 pb-4" id="internal-title">
+                    <i data-lucide="app-window" class="w-8 h-8"></i> Internal Page
+                </h1>
+                <div id="internal-content" class="text-gray-300">
+                    <!-- Content populated by JS -->
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- Scripts -->
+    <script>
+        // Initialize Lucide Icons
+        lucide.createIcons();
+
+        /**
+         * CineBrowse Pro - Core Application Logic
+         */
+        class CineBrowser {
+            constructor() {
+                // State
+                this.tabs = [];
+                this.activeTabId = null;
+                this.tabCounter = 0;
+                
+                // Storage (In-memory simulation as per system constraint "Default to In-Memory State")
+                this.history = [];
+                this.bookmarks = [];
+
+                // DOM Elements
+                this.els = {
+                    tabsContainer: document.getElementById('tabs-container'),
+                    btnNewTab: document.getElementById('btn-new-tab'),
+                    viewsContainer: document.getElementById('views-container'),
+                    addressInput: document.getElementById('address-input'),
+                    btnBack: document.getElementById('btn-back'),
+                    btnForward: document.getElementById('btn-forward'),
+                    btnRefresh: document.getElementById('btn-refresh'),
+                    btnHome: document.getElementById('btn-home'),
+                    securityIcon: document.getElementById('security-icon'),
+                    btnMenu: document.getElementById('btn-menu'),
+                    mainMenu: document.getElementById('main-menu'),
+                    btnAI: document.getElementById('btn-ai'),
+                    aiPanel: document.getElementById('ai-panel'),
+                    devPanel: document.getElementById('dev-panel'),
+                    toast: document.getElementById('toast'),
+                    toastMsg: document.getElementById('toast-msg'),
+                    loader: document.getElementById('page-loader'),
+                    passwordPrompt: document.getElementById('password-prompt'),
+                    btnVoice: document.getElementById('btn-voice'),
+                    btnAdblock: document.getElementById('btn-adblock'),
+                    btnBookmark: document.getElementById('btn-bookmark')
+                };
+
+                // Search engine setting
+                this.searchEngine = 'https://www.bing.com/search?q='; // Better iframe support than Google
+                
+                // Bind events
+                this.bindEvents();
+                
+                // Initialization
+                this.init();
+            }
+
+            init() {
+                // Create the first tab (Dashboard)
+                this.openNewTab();
+                
+                // Close menus when clicking outside
+                document.addEventListener('click', (e) => {
+                    if (!this.els.btnMenu.contains(e.target) && !this.els.mainMenu.contains(e.target)) {
+                        this.els.mainMenu.classList.remove('opacity-100', 'scale-100', 'pointer-events-auto');
+                        this.els.mainMenu.classList.add('opacity-0', 'scale-95', 'pointer-events-none');
+                    }
+                });
+            }
+
+            bindEvents() {
+                this.els.btnNewTab.addEventListener('click', () => this.openNewTab());
+                
+                // Address Bar
+                this.els.addressInput.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        this.navigate(this.els.addressInput.value);
+                    }
+                });
+                this.els.addressInput.addEventListener('focus', () => {
+                    this.els.addressInput.select();
+                });
+
+                // Nav Buttons
+                this.els.btnBack.addEventListener('click', () => this.goBack());
+                this.els.btnForward.addEventListener('click', () => this.goForward());
+                this.els.btnRefresh.addEventListener('click', () => this.refresh());
+                this.els.btnHome.addEventListener('click', () => this.navigate('cine://newtab'));
+
+                // Menus & Tools
+                this.els.btnMenu.addEventListener('click', () => this.toggleMenu());
+                this.els.btnVoice.addEventListener('click', () => this.handleVoiceSearch());
+                this.els.btnBookmark.addEventListener('click', () => this.toggleBookmark());
+                this.els.btnAdblock.addEventListener('click', () => this.showToast("Ad-blocker active: Tracking & Ads blocked."));
+            }
+
+            // --- Tab Management ---
+
+            openNewTab(incognito = false) {
+                const tabId = `tab-${++this.tabCounter}`;
+                const isIncognito = incognito;
+                
+                const tabData = {
+                    id: tabId,
+                    title: 'New Tab',
+                    url: 'cine://newtab',
+                    history: ['cine://newtab'],
+                    historyIndex: 0,
+                    incognito: isIncognito
+                };
+
+                this.tabs.push(tabData);
+
+                // Create Tab UI
+                const tabEl = document.createElement('div');
+                tabEl.className = `flex items-center gap-2 px-3 py-2 text-sm rounded-t-lg cursor-pointer transition-all min-w-[140px] max-w-[200px] border-t border-l border-r border-white/5 tab-enter group ${isIncognito ? 'bg-gray-900 text-gray-300' : 'bg-[#050505] text-gray-400'}`;
+                tabEl.id = `ui-${tabId}`;
+                tabEl.onclick = () => this.switchTab(tabId);
+
+                const iconClass = isIncognito ? 'glasses' : 'globe';
+                tabEl.innerHTML = `
+                    <div class="w-4 h-4 flex-shrink-0 text-gray-500 tab-icon">
+                        <i data-lucide="${iconClass}" class="w-4 h-4"></i>
+                    </div>
+                    <span class="truncate flex-1 select-none tab-title">New Tab</span>
+                    <button class="w-5 h-5 flex items-center justify-center rounded-full hover:bg-white/20 text-gray-500 hover:text-white opacity-0 group-hover:opacity-100 transition-opacity" onclick="event.stopPropagation(); cineBrowser.closeTab('${tabId}')">
+                        <i data-lucide="x" class="w-3 h-3"></i>
+                    </button>
+                `;
+                
+                this.els.tabsContainer.appendChild(tabEl);
+                lucide.createIcons({ root: tabEl });
+
+                // Create View UI (Iframe/Dashboard wrapper)
+                const viewEl = document.createElement('div');
+                viewEl.className = 'view-container';
+                viewEl.id = `view-${tabId}`;
+                this.els.viewsContainer.appendChild(viewEl);
+
+                this.switchTab(tabId);
+                this.renderView(tabId);
+            }
+
+            closeTab(tabId) {
+                if (this.tabs.length === 1) {
+                    // If last tab, open a new one then close this
+                    this.openNewTab();
+                }
+
+                const tabIndex = this.tabs.findIndex(t => t.id === tabId);
+                
+                // Remove DOM elements
+                const tabUI = document.getElementById(`ui-${tabId}`);
+                const viewUI = document.getElementById(`view-${tabId}`);
+                if (tabUI) tabUI.remove();
+                if (viewUI) viewUI.remove();
+
+                // Remove from state
+                this.tabs.splice(tabIndex, 1);
+
+                // Switch to adjacent tab if closed was active
+                if (this.activeTabId === tabId) {
+                    const nextTab = this.tabs[tabIndex] || this.tabs[tabIndex - 1];
+                    this.switchTab(nextTab.id);
+                }
+            }
+
+            switchTab(tabId) {
+                this.activeTabId = tabId;
+                const tabData = this.getActiveTab();
+
+                // Update Tab UI styles
+                this.tabs.forEach(t => {
+                    const ui = document.getElementById(`ui-${t.id}`);
+                    const view = document.getElementById(`view-${t.id}`);
+                    if (!ui || !view) return;
+
+                    if (t.id === tabId) {
+                        ui.classList.remove('bg-transparent', 'text-gray-400', 'border-transparent');
+                        ui.classList.add(t.incognito ? 'bg-gray-800' : 'bg-[#050505]', 'text-white', 'border-white/10');
+                        view.classList.add('active');
+                    } else {
+                        ui.classList.remove(t.incognito ? 'bg-gray-800' : 'bg-[#050505]', 'text-white', 'border-white/10');
+                        ui.classList.add('bg-transparent', 'text-gray-400', 'border-transparent');
+                        view.classList.remove('active');
+                    }
+                });
+
+                this.updateNavUI();
+                
+                // Update Address Bar
+                if (tabData.url === 'cine://newtab') {
+                    this.els.addressInput.value = '';
+                } else {
+                    this.els.addressInput.value = tabData.url;
+                }
+                
+                // Close panels
+                this.closeDevTools();
+                this.els.passwordPrompt.classList.remove('opacity-100', 'translate-y-0', 'pointer-events-auto');
+            }
+
+            getActiveTab() {
+                return this.tabs.find(t => t.id === this.activeTabId);
+            }
+
+            // --- Navigation ---
+
+            navigate(input) {
+                let url = input.trim();
+                const tabData = this.getActiveTab();
+                
+                if (!url) return;
+
+                // Smart URL detection
+                if (url.startsWith('cine://')) {
+                    // Internal pages
+                } else if (/^(https?:\/\/)/i.test(url)) {
+                    // Valid URL format
+                } else if (/^[a-zA-Z0-9-]+\.[a-zA-Z]{2,}(\/.*)?$/.test(url)) {
+                    // Domain-like without protocol
+                    url = 'https://' + url;
+                } else {
+                    // Search query
+                    url = this.searchEngine + encodeURIComponent(url);
+                }
+
+                // Update History logic
+                tabData.history = tabData.history.slice(0, tabData.historyIndex + 1);
+                tabData.history.push(url);
+                tabData.historyIndex++;
+                tabData.url = url;
+                
+                // Global history (if not incognito)
+                if (!tabData.incognito && !url.startsWith('cine://')) {
+                    this.history.unshift({ url, title: url, time: new Date().toLocaleTimeString() });
+                    if(this.history.length > 50) this.history.pop();
+                }
+
+                this.renderView(this.activeTabId);
+                
+                // Randomly show password prompt demo
+                if (url.startsWith('https') && Math.random() > 0.7) {
+                    setTimeout(() => this.showPasswordPrompt(), 2000);
+                }
+            }
+
+            goBack() {
+                const tab = this.getActiveTab();
+                if (tab.historyIndex > 0) {
+                    tab.historyIndex--;
+                    tab.url = tab.history[tab.historyIndex];
+                    this.renderView(tab.id);
+                }
+            }
+
+            goForward() {
+                const tab = this.getActiveTab();
+                if (tab.historyIndex < tab.history.length - 1) {
+                    tab.historyIndex++;
+                    tab.url = tab.history[tab.historyIndex];
+                    this.renderView(tab.id);
+                }
+            }
+
+            refresh() {
+                this.renderView(this.activeTabId);
+            }
+
+            updateNavUI() {
+                const tab = this.getActiveTab();
+                
+                // Back/Forward states
+                this.els.btnBack.disabled = tab.historyIndex === 0;
+                this.els.btnForward.disabled = tab.historyIndex === tab.history.length - 1;
+
+                // Address Bar Content
+                if (tab.url === 'cine://newtab') {
+                    this.els.addressInput.value = '';
+                    this.updateTabTitle(tab.id, 'New Tab', 'globe');
+                    this.els.securityIcon.innerHTML = `<i data-lucide="search" class="w-4 h-4 text-gray-500"></i>`;
+                } else {
+                    this.els.addressInput.value = tab.url;
+                    
+                    // Basic Title extraction (fallback)
+                    let title = tab.url;
+                    try { const u = new URL(tab.url); title = u.hostname; } catch(e){}
+                    this.updateTabTitle(tab.id, title, tab.url.startsWith('https') ? 'lock' : 'globe');
+                    
+                    // Security Icon
+                    if(tab.url.startsWith('https')) {
+                        this.els.securityIcon.innerHTML = `<i data-lucide="lock" class="w-4 h-4 text-green-500"></i>`;
+                    } else if (tab.url.startsWith('cine://')) {
+                        this.els.securityIcon.innerHTML = `<i data-lucide="settings" class="w-4 h-4 text-blue-400"></i>`;
+                    } else {
+                        this.els.securityIcon.innerHTML = `<i data-lucide="info" class="w-4 h-4 text-gray-400"></i>`;
+                    }
+                }
+                
+                // Bookmark state
+                const isBookmarked = this.bookmarks.some(b => b.url === tab.url);
+                this.els.btnBookmark.classList.toggle('text-yellow-400', isBookmarked);
+                this.els.btnBookmark.classList.toggle('text-gray-400', !isBookmarked);
+
+                lucide.createIcons({ root: this.els.securityIcon });
+            }
+
+            updateTabTitle(tabId, title, iconName) {
+                const tabUI = document.getElementById(`ui-${tabId}`);
+                if(!tabUI) return;
+                
+                const titleEl = tabUI.querySelector('.tab-title');
+                const iconEl = tabUI.querySelector('.tab-icon');
+                
+                if(titleEl) titleEl.textContent = title;
+                if(iconEl) {
+                    iconEl.innerHTML = `<i data-lucide="${iconName}" class="w-4 h-4"></i>`;
+                    lucide.createIcons({ root: iconEl });
+                }
+                
+                const tabData = this.tabs.find(t => t.id === tabId);
+                if(tabData) tabData.title = title;
+            }
+
+            // --- View Rendering ---
+
+            renderView(tabId) {
+                const tab = this.tabs.find(t => t.id === tabId);
+                const viewEl = document.getElementById(`view-${tabId}`);
+                if (!tab || !viewEl) return;
+
+                // Show loader
+                this.simulateLoading();
+
+                viewEl.innerHTML = ''; // clear
+
+                if (tab.url === 'cine://newtab') {
+                    // Render Dashboard
+                    const template = document.getElementById('tpl-dashboard').content.cloneNode(true);
+                    viewEl.appendChild(template);
+                    this.updateDashboardWidgets(viewEl);
+                } 
+                else if (tab.url.startsWith('cine://')) {
+                    // Render Internal Pages
+                    const template = document.getElementById('tpl-internal-page').content.cloneNode(true);
+                    viewEl.appendChild(template);
+                    this.renderInternalPage(tab.url, viewEl);
+                }
+                else {
+                    // Render Iframe
+                    const iframe = document.createElement('iframe');
+                    iframe.sandbox = "allow-same-origin allow-scripts allow-popups allow-forms";
+                    iframe.src = tab.url;
+                    
+                    // Fallback for X-Frame-Options (simulated error handling visually)
+                    // Note: Real errors cannot be caught by JS due to cross-origin policies, 
+                    // so we just display the iframe. Some sites will show connection refused.
+                    
+                    iframe.onload = () => {
+                        try {
+                            // Try to get actual title if same-origin (unlikely but good practice)
+                            const title = iframe.contentDocument.title;
+                            if(title) this.updateTabTitle(tabId, title, 'file-text');
+                        } catch(e) {
+                            // Cross-origin, ignore
+                        }
+                    };
+                    viewEl.appendChild(iframe);
+                }
+                
+                this.updateNavUI();
+            }
+
+            simulateLoading() {
+                this.els.loader.style.opacity = '1';
+                this.els.loader.style.width = '30%';
+                
+                setTimeout(() => { this.els.loader.style.width = '70%'; }, 200);
+                setTimeout(() => { 
+                    this.els.loader.style.width = '100%'; 
+                    setTimeout(() => {
+                        this.els.loader.style.opacity = '0';
+                        setTimeout(() => { this.els.loader.style.width = '0%'; }, 300);
+                    }, 200);
+                }, 600);
+            }
+
+            handleDashboardSearch(form) {
+                const q = form.q.value;
+                if(q) this.navigate(q);
+            }
+
+            updateDashboardWidgets(viewEl) {
+                const historyContainer = viewEl.querySelector('#dash-history');
+                if(historyContainer && this.history.length > 0) {
+                    historyContainer.innerHTML = '';
+                    this.history.slice(0, 4).forEach(h => {
+                        const div = document.createElement('div');
+                        div.className = "flex items-center justify-between p-2 hover:bg-white/5 rounded-lg cursor-pointer transition-colors";
+                        div.onclick = () => this.navigate(h.url);
+                        
+                        // Extract domain for display
+                        let domain = h.url;
+                        try { domain = new URL(h.url).hostname; } catch(e){}
+
+                        div.innerHTML = `
+                            <div class="flex items-center gap-2 truncate">
+                                <i data-lucide="link" class="w-3 h-3 text-gray-500"></i>
+                                <span class="truncate">${domain}</span>
+                            </div>
+                            <span class="text-[10px] text-gray-600">${h.time}</span>
+                        `;
+                        historyContainer.appendChild(div);
+                    });
+                    lucide.createIcons({ root: historyContainer });
+                }
+            }
+
+            // --- Internal Pages ---
+
+            renderInternalPage(url, viewEl) {
+                const titleEl = viewEl.querySelector('#internal-title');
+                const contentEl = viewEl.querySelector('#internal-content');
+                const page = url.replace('cine://', '');
+
+                if (page === 'history') {
+                    titleEl.innerHTML = `<i data-lucide="history" class="w-8 h-8"></i> Browsing History`;
+                    
+                    if (this.history.length === 0) {
+                        contentEl.innerHTML = `<p class="text-center mt-10 text-gray-500">No browsing history yet.</p>`;
+                    } else {
+                        const list = document.createElement('div');
+                        list.className = 'space-y-2';
+                        this.history.forEach(item => {
+                            const row = document.createElement('div');
+                            row.className = 'flex items-center justify-between p-4 bg-white/5 rounded-xl hover:bg-white/10 cursor-pointer transition-colors border border-transparent hover:border-white/5';
+                            row.onclick = () => this.navigate(item.url);
+                            row.innerHTML = `
+                                <div class="flex flex-col truncate flex-1 mr-4">
+                                    <span class="font-medium text-gray-200 truncate">${item.title}</span>
+                                    <span class="text-xs text-gray-500 truncate">${item.url}</span>
+                                </div>
+                                <span class="text-xs text-gray-600 whitespace-nowrap">${item.time}</span>
+                            `;
+                            list.appendChild(row);
+                        });
+                        contentEl.appendChild(list);
+                    }
+                } 
+                else if (page === 'bookmarks') {
+                    titleEl.innerHTML = `<i data-lucide="bookmark" class="w-8 h-8"></i> Bookmarks`;
+                    if (this.bookmarks.length === 0) {
+                        contentEl.innerHTML = `<p class="text-center mt-10 text-gray-500">No bookmarks saved. Click the star icon to save a page.</p>`;
+                    } else {
+                        const grid = document.createElement('div');
+                        grid.className = 'grid grid-cols-1 md:grid-cols-2 gap-4';
+                        this.bookmarks.forEach(item => {
+                            const card = document.createElement('div');
+                            card.className = 'flex items-center p-4 bg-white/5 rounded-xl hover:bg-white/10 cursor-pointer transition-colors border border-white/5';
+                            card.onclick = () => this.navigate(item.url);
+                            card.innerHTML = `
+                                <div class="w-10 h-10 bg-red-900/30 rounded-lg flex items-center justify-center mr-4 text-red-400">
+                                    <i data-lucide="star" class="w-5 h-5"></i>
+                                </div>
+                                <div class="flex flex-col truncate flex-1">
+                                    <span class="font-medium text-gray-200 truncate">${item.title}</span>
+                                    <span class="text-xs text-gray-500 truncate">${item.url}</span>
+                                </div>
+                            `;
+                            grid.appendChild(card);
+                        });
+                        contentEl.appendChild(grid);
+                    }
+                }
+                else if (page === 'settings') {
+                    titleEl.innerHTML = `<i data-lucide="settings" class="w-8 h-8"></i> Settings`;
+                    contentEl.innerHTML = `
+                        <div class="space-y-6">
+                            <div class="p-4 bg-white/5 rounded-xl border border-white/5">
+                                <h3 class="text-lg font-medium text-white mb-4">Appearance</h3>
+                                <div class="flex items-center justify-between">
+                                    <span>Dark Mode</span>
+                                    <div class="w-10 h-5 bg-red-600 rounded-full relative cursor-pointer">
+                                        <div class="w-4 h-4 bg-white rounded-full absolute right-1 top-0.5 shadow"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="p-4 bg-white/5 rounded-xl border border-white/5">
+                                <h3 class="text-lg font-medium text-white mb-4">Search Engine</h3>
+                                <select class="w-full bg-black border border-white/20 rounded-lg p-2 text-white outline-none focus:border-red-500">
+                                    <option value="bing">Bing (Recommended for Iframes)</option>
+                                    <option value="google">Google</option>
+                                    <option value="duckduckgo">DuckDuckGo</option>
+                                </select>
+                            </div>
+                            <div class="p-4 bg-white/5 rounded-xl border border-white/5">
+                                <h3 class="text-lg font-medium text-white mb-4">Privacy & Security</h3>
+                                <div class="flex items-center justify-between mb-3">
+                                    <span>Block Trackers & Ads</span>
+                                    <div class="w-10 h-5 bg-red-600 rounded-full relative cursor-pointer">
+                                        <div class="w-4 h-4 bg-white rounded-full absolute right-1 top-0.5 shadow"></div>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span>Clear Browsing Data</span>
+                                    <button class="px-3 py-1 bg-white/10 hover:bg-red-900/50 rounded-lg transition-colors text-sm" onclick="cineBrowser.clearData()">Clear Data</button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+                else if (['instagram', 'chatgpt'].includes(page)) {
+                    // Mocks for sites that refuse iframe connection natively
+                    titleEl.innerHTML = `<i data-lucide="app-window" class="w-8 h-8"></i> ${page.charAt(0).toUpperCase() + page.slice(1)} (Simulation)`;
+                    contentEl.innerHTML = `
+                        <div class="flex flex-col items-center justify-center py-20 text-center">
+                            <i data-lucide="shield-alert" class="w-16 h-16 text-yellow-500 mb-4"></i>
+                            <h2 class="text-2xl font-bold text-white mb-2">Connection Blocked by Origin</h2>
+                            <p class="text-gray-400 max-w-md">Real-world modern websites like ${page} utilize "X-Frame-Options" or "Content-Security-Policy" headers that prevent them from being embedded inside web browsers built within standard webpages. <br><br> In a native desktop app context (like Electron), this would load normally.</p>
+                            <button onclick="cineBrowser.navigate('cine://newtab')" class="mt-8 px-6 py-2 bg-red-800 hover:bg-red-700 rounded-lg text-white font-medium transition-all">Return to Dashboard</button>
+                        </div>
+                    `;
+                }
+
+                lucide.createIcons({ root: viewEl });
+            }
+
+            // --- Features & Tools ---
+
+            toggleMenu() {
+                const isHidden = this.els.mainMenu.classList.contains('opacity-0');
+                if (isHidden) {
+                    this.els.mainMenu.classList.remove('opacity-0', 'scale-95', 'pointer-events-none');
+                    this.els.mainMenu.classList.add('opacity-100', 'scale-100', 'pointer-events-auto');
+                } else {
+                    this.els.mainMenu.classList.add('opacity-0', 'scale-95', 'pointer-events-none');
+                    this.els.mainMenu.classList.remove('opacity-100', 'scale-100', 'pointer-events-auto');
+                }
+            }
+
+            showSettings() {
+                this.navigate('cine://settings');
+                this.toggleMenu();
+            }
+
+            showHistory() {
+                this.navigate('cine://history');
+                this.toggleMenu();
+            }
+
+            showBookmarks() {
+                this.navigate('cine://bookmarks');
+                this.toggleMenu();
+            }
+
+            toggleBookmark() {
+                const tab = this.getActiveTab();
+                if(tab.url.startsWith('cine://')) return; // Don't bookmark internals
+
+                const existingIndex = this.bookmarks.findIndex(b => b.url === tab.url);
+                if (existingIndex >= 0) {
+                    this.bookmarks.splice(existingIndex, 1);
+                    this.showToast('Bookmark removed');
+                } else {
+                    this.bookmarks.push({ url: tab.url, title: tab.title });
+                    this.showToast('Page bookmarked');
+                }
+                this.updateNavUI();
+            }
+
+            simulateDownload() {
+                this.toggleMenu();
+                this.showToast('Starting secure download simulation...');
+                setTimeout(() => {
+                    this.showToast('Download complete: file_media.mp4');
+                }, 2000);
+            }
+
+            toggleZoom() {
+                const view = document.getElementById(`view-${this.activeTabId}`);
+                if (!view) return;
+                
+                const currentZoom = view.style.zoom || '1';
+                view.style.zoom = currentZoom === '1' ? '1.25' : '1';
+                this.showToast(`Zoom level set to ${view.style.zoom === '1' ? '100%' : '125%'}`);
+            }
+
+            findInPage() {
+                this.toggleMenu();
+                const text = prompt("Enter text to find:");
+                if (text) {
+                    // Cannot access cross-origin iframe content. Simulate behavior.
+                    this.showToast(`0 results found for "${text}" (Cross-origin restriction)`);
+                }
+            }
+
+            translatePage() {
+                this.toggleMenu();
+                this.showToast('Translating page to English...');
+                this.simulateLoading();
+            }
+
+            handleVoiceSearch() {
+                if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+                    this.showToast("Voice search not supported in this browser.");
+                    return;
+                }
+
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                const recognition = new SpeechRecognition();
+                
+                recognition.onstart = () => {
+                    this.els.btnVoice.classList.add('text-red-500', 'animate-pulse');
+                    this.els.addressInput.placeholder = "Listening...";
+                };
+                
+                recognition.onresult = (event) => {
+                    const transcript = event.results[0][0].transcript;
+                    this.els.addressInput.value = transcript;
+                    this.navigate(transcript);
+                };
+                
+                recognition.onend = () => {
+                    this.els.btnVoice.classList.remove('text-red-500', 'animate-pulse');
+                    this.els.addressInput.placeholder = "Search the web or enter URL...";
+                };
+
+                recognition.start();
+            }
+
+            // --- AI Assistant ---
+
+            toggleAI() {
+                const isHidden = this.els.aiPanel.classList.contains('translate-x-full');
+                if (isHidden) {
+                    this.els.aiPanel.classList.remove('translate-x-full');
+                } else {
+                    this.els.aiPanel.classList.add('translate-x-full');
+                }
+            }
+
+            sendAIMessage() {
+                const input = document.getElementById('ai-input');
+                const text = input.value.trim();
+                if (!text) return;
+
+                const chatArea = document.getElementById('ai-chat-area');
+                
+                // Add user message
+                const userMsg = document.createElement('div');
+                userMsg.className = 'bg-red-900/40 rounded-2xl rounded-tr-sm p-3 border border-red-900/50 text-sm text-white self-end w-[85%] mb-2';
+                userMsg.textContent = text;
+                chatArea.appendChild(userMsg);
+                
+                input.value = '';
+                chatArea.scrollTop = chatArea.scrollHeight;
+
+                // Add loading indicator
+                const loaderId = 'ai-load-' + Date.now();
+                const loader = document.createElement('div');
+                loader.id = loaderId;
+                loader.className = 'text-xs text-gray-500 mb-2 flex items-center gap-2';
+                loader.innerHTML = '<i data-lucide="loader" class="w-3 h-3 animate-spin"></i> Cine AI is thinking...';
+                chatArea.appendChild(loader);
+                lucide.createIcons({root: loader});
+                chatArea.scrollTop = chatArea.scrollHeight;
+
+                // Simulate AI response
+                setTimeout(() => {
+                    document.getElementById(loaderId).remove();
+                    
+                    const aiMsg = document.createElement('div');
+                    aiMsg.className = 'bg-white/5 rounded-2xl rounded-tl-sm p-3 border border-white/5 text-sm text-gray-200 w-[85%] mb-2';
+                    
+                    // Simple mock logic
+                    let response = "I understand. Since I am a simulated assistant in this demo, I cannot connect to a live LLM endpoint right now. However, I can confirm the current active URL is: " + this.getActiveTab().url;
+                    
+                    if (text.toLowerCase().includes('summarize')) {
+                        response = "Based on the page structure, this appears to be a web resource. A true summary would require cross-origin DOM access which is restricted, but the metadata suggests it's related to: " + this.getActiveTab().title;
+                    }
+
+                    aiMsg.textContent = response;
+                    chatArea.appendChild(aiMsg);
+                    chatArea.scrollTop = chatArea.scrollHeight;
+                }, 1500);
+            }
+
+            // --- Developer Tools ---
+
+            openDevTools() {
+                this.toggleMenu();
+                this.els.devPanel.classList.remove('translate-y-full');
+                this.fetchSourceCode();
+            }
+
+            closeDevTools() {
+                this.els.devPanel.classList.add('translate-y-full');
+            }
+
+            async fetchSourceCode() {
+                const contentEl = document.getElementById('dev-source-content');
+                const url = this.getActiveTab().url;
+                
+                if (url.startsWith('cine://')) {
+                    contentEl.innerHTML = `<span class="text-blue-400">&lt;!-- Internal CineBrowse Page --&gt;</span>\n<span class="text-gray-300">DOM is rendered virtually.</span>`;
+                    return;
+                }
+
+                contentEl.innerHTML = '<div class="animate-pulse text-gray-500">Fetching source code via Proxy...</div>';
+
+                try {
+                    // Using AllOrigins CORS proxy for demo purposes
+                    const response = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(url)}`);
+                    if (response.ok) {
+                        const data = await response.json();
+                        // Basic syntax highlighting simulation
+                        let html = data.contents.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                        html = html.replace(/(&lt;[a-z0-9]+)/gi, '<span class="text-blue-400">$1</span>');
+                        html = html.replace(/(&lt;\/[a-z0-9]+&gt;)/gi, '<span class="text-blue-400">$1</span>');
+                        html = html.replace(/([a-z-]+)=/gi, '<span class="text-yellow-300">$1</span>=');
+                        html = html.replace(/("[^"]*")/g, '<span class="text-green-300">$1</span>');
+                        
+                        contentEl.innerHTML = `<pre><code>${html}</code></pre>`;
+                    } else {
+                        throw new Error('Network response was not ok');
+                    }
+                } catch (error) {
+                    contentEl.innerHTML = `<span class="text-red-400">Error fetching source. The site may block proxy requests.</span>\n<span class="text-gray-500">URL: ${url}</span>`;
+                }
+            }
+
+            // --- UI Utilities ---
+
+            showToast(message) {
+                this.els.toastMsg.textContent = message;
+                this.els.toast.classList.remove('opacity-0', 'translate-y-4', 'pointer-events-none');
+                
+                if(this.toastTimeout) clearTimeout(this.toastTimeout);
+                
+                this.toastTimeout = setTimeout(() => {
+                    this.els.toast.classList.add('opacity-0', 'translate-y-4', 'pointer-events-none');
+                }, 3000);
+            }
+
+            showPasswordPrompt() {
+                this.els.passwordPrompt.classList.remove('opacity-0', 'translate-y-[-20px]', 'pointer-events-none');
+                this.els.passwordPrompt.classList.add('opacity-100', 'translate-y-0', 'pointer-events-auto');
+            }
+
+            hidePasswordPrompt() {
+                this.els.passwordPrompt.classList.remove('opacity-100', 'translate-y-0', 'pointer-events-auto');
+                this.els.passwordPrompt.classList.add('opacity-0', 'translate-y-[-20px]', 'pointer-events-none');
+                this.showToast('Password preference saved securely.');
+            }
+
+            clearData() {
+                this.history = [];
+                this.bookmarks = [];
+                this.showToast("All browsing data cleared successfully.");
+                if(this.getActiveTab().url === 'cine://settings') {
+                    this.renderView(this.activeTabId); // re-render
+                }
+            }
+        }
+
+        // Initialize App
+        const cineBrowser = new CineBrowser();
+    </script>
+</body>
+</html>            --bg-panel: #121212;
             --glass-border: rgba(255, 255, 255, 0.08);
             --safe-top: env(safe-area-inset-top, 0px);
             --safe-bottom: env(safe-area-inset-bottom, 0px);
